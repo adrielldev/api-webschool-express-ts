@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: api
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - DATABASE_URL=postgres://luccas:1234@db:5432/api_webschool
+      - SECRET_KEY=7cd9f0962690818c4f5c6e923d81dbc5
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+  db:
+    container_name: db
+    image: postgres:14
+    ports:
+      - 5431:5432
+    environment:
+      - POSTGRES_USER=luccas
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=api_webschool
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luccas -d api_webschool"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
